@@ -52,6 +52,15 @@
 #define APP_TX_DATA_SIZE  2048
 /* USER CODE BEGIN EXPORTED_DEFINES */
 
+#define MESSAGE_SIZE      9
+#define MESSAGE_PERIOD 2000
+
+#define MIN_POS     0
+#define MAX_POS 64000
+
+#define MIN_DELAY     40
+#define DEFAULT_DELAY 60
+
 /* USER CODE END EXPORTED_DEFINES */
 
 /**
@@ -108,6 +117,13 @@ extern USBD_CDC_ItfTypeDef USBD_Interface_fops_FS;
 uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 
 /* USER CODE BEGIN EXPORTED_FUNCTIONS */
+
+uint8_t Is_New_Pos(void);
+
+uint16_t Get_M1_Pos_Target(void);
+uint16_t Get_M2_Pos_Target(void);
+uint16_t Get_M3_Pos_Target(void);
+uint16_t Get_M4_Pos_Target(void);
 
 /* USER CODE END EXPORTED_FUNCTIONS */
 

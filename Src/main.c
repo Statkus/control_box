@@ -23,6 +23,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "usbd_cdc_if.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,6 +53,8 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
+
+void Delay_Us (uint16_t us);
 
 /* USER CODE END PFP */
 
@@ -91,6 +95,49 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_GPIO_WritePin (M1_PUL_GPIO_Port, M1_PUL_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin (M2_PUL_GPIO_Port, M2_PUL_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin (M3_PUL_GPIO_Port, M3_PUL_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin (M4_PUL_GPIO_Port, M4_PUL_Pin, GPIO_PIN_SET);
+
+  HAL_TIM_Base_Start(&htim3);
+
+  uint16_t M_Pos[4] = {0};
+  uint16_t M_Pos_Target[4] = {0};
+
+  GPIO_PinState M_Dir[4] =
+   {GPIO_PIN_RESET,
+    GPIO_PIN_RESET,
+    GPIO_PIN_RESET,
+    GPIO_PIN_RESET};
+
+  GPIO_TypeDef *M_PUL_GPIO_Port[4] =
+   {M1_PUL_GPIO_Port,
+    M2_PUL_GPIO_Port,
+    M3_PUL_GPIO_Port,
+    M4_PUL_GPIO_Port};
+
+  const uint16_t M_PUL_Pin[4] =
+   {M1_PUL_Pin,
+    M2_PUL_Pin,
+    M3_PUL_Pin,
+    M4_PUL_Pin};
+
+  GPIO_TypeDef *M_DIR_GPIO_Port[4] =
+   {M1_DIR_GPIO_Port,
+    M2_DIR_GPIO_Port,
+    M3_DIR_GPIO_Port,
+    M4_DIR_GPIO_Port};
+
+  const uint16_t M_DIR_Pin[4] =
+   {M1_DIR_Pin,
+    M2_DIR_Pin,
+    M3_DIR_Pin,
+    M4_DIR_Pin};
+
+  uint16_t M_Delay          = DEFAULT_DELAY;
+  uint16_t Previous_M_Delay = DEFAULT_DELAY;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -100,8 +147,103 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    HAL_GPIO_WritePin (LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+
+    if (Is_New_Pos() > 0) {
+      HAL_GPIO_WritePin (LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+
+      M_Pos_Target[0] = Get_M1_Pos_Target();
+      M_Pos_Target[1] = Get_M2_Pos_Target();
+      M_Pos_Target[2] = Get_M3_Pos_Target();
+      M_Pos_Target[3] = Get_M4_Pos_Target();
+
+      uint16_t Dist[4] = {0};
+
+      for (int i = 0; i < 4; i++) {
+        if (M_Pos[i] > M_Pos_Target[i]) {
+          Dist[i] = M_Pos[i] - M_Pos_Target[i];
+        } else {
+          Dist[i] = M_Pos_Target[i] - M_Pos[i];
+        }
+      }
+
+      if (Dist[0] > 0 ||
+          Dist[1] > 0 ||
+          Dist[2] > 0 ||
+          Dist[3] > 0) {
+        M_Delay =
+         MAX (MESSAGE_PERIOD / MAX (MAX (MAX (Dist[0], Dist[1]), Dist[2]), Dist[3]), MIN_DELAY);
+      }
+    }
+
+    if (M_Pos[0] != M_Pos_Target[0] ||
+        M_Pos[1] != M_Pos_Target[1] ||
+        M_Pos[2] != M_Pos_Target[2] ||
+        M_Pos[3] != M_Pos_Target[3]) {
+      uint8_t Change_DIR = 0;
+
+      for (int i = 0; i < 4; i++) {
+        if (M_Pos[i] != M_Pos_Target[i]) {
+          const GPIO_PinState New_Dir =
+           (M_Pos[i] < M_Pos_Target[i]) ? GPIO_PIN_RESET : GPIO_PIN_SET;
+
+          if (New_Dir != M_Dir[i]) {
+            HAL_GPIO_WritePin (M_DIR_GPIO_Port[i], M_DIR_Pin[i], New_Dir);
+
+            M_Dir[i] = New_Dir;
+
+            Change_DIR = 1;
+          }
+        }
+      }
+
+      if (Change_DIR > 0) {
+        if (M_Delay < DEFAULT_DELAY) {
+          Previous_M_Delay = DEFAULT_DELAY;
+        } else {
+          Previous_M_Delay = M_Delay;
+        }
+
+        Delay_Us(DIR_DELAY);
+      } else {
+        if (Previous_M_Delay > M_Delay + DEFAULT_DELAY) {
+          Previous_M_Delay = DEFAULT_DELAY;
+        } else if (Previous_M_Delay > M_Delay) {
+          Previous_M_Delay--;
+        } else {
+          Previous_M_Delay = M_Delay;
+        }
+      }
+
+      for (int i = 0; i < 4; i++) {
+        if (M_Pos[i] != M_Pos_Target[i]) {
+          HAL_GPIO_WritePin (M_PUL_GPIO_Port[i], M_PUL_Pin[i], GPIO_PIN_RESET);
+        }
+      }
+
+      Delay_Us(PUL_DOWN_DELAY);
+
+      for (int i = 0; i < 4; i++) {
+        if (M_Pos[i] != M_Pos_Target[i]) {
+          if (M_Dir[i] == GPIO_PIN_RESET) {
+            M_Pos[i]++;
+          } else {
+            M_Pos[i]--;
+          }
+
+          HAL_GPIO_WritePin (M_PUL_GPIO_Port[i], M_PUL_Pin[i], GPIO_PIN_SET);
+        }
+      }
+
+      if (Previous_M_Delay > PUL_DOWN_DELAY + WAISTED_DELAY) {
+        Delay_Us(Previous_M_Delay - PUL_DOWN_DELAY - WAISTED_DELAY);
+      }
+    } else {
+      Previous_M_Delay = DEFAULT_DELAY;
+    }
+
+    HAL_GPIO_WritePin (LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
   }
+
   /* USER CODE END 3 */
 }
 
@@ -235,6 +377,12 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+void Delay_Us (uint16_t us)
+{
+  __HAL_TIM_SET_COUNTER(&htim3, 0);
+  while (__HAL_TIM_GET_COUNTER(&htim3) < us);
+}
+
 /* USER CODE END 4 */
 
 /**
@@ -263,8 +411,6 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

@@ -95,6 +95,13 @@ uint8_t UserTxBufferFS[APP_TX_DATA_SIZE];
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
 
+uint8_t New_Pos = 0;
+
+uint16_t M1_Pos_Target = MIN_POS;
+uint16_t M2_Pos_Target = MIN_POS;
+uint16_t M3_Pos_Target = MIN_POS;
+uint16_t M4_Pos_Target = MIN_POS;
+
 /* USER CODE END PRIVATE_VARIABLES */
 
 /**
@@ -263,6 +270,23 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+
+  switch (Buf[0]) {
+    case 'P':
+      if (*Len >= MESSAGE_SIZE) {
+        M1_Pos_Target = MAX (MIN ((Buf[1] << 8) + Buf[2], MAX_POS), MIN_POS);
+        M2_Pos_Target = MAX (MIN ((Buf[3] << 8) + Buf[4], MAX_POS), MIN_POS);
+        M3_Pos_Target = MAX (MIN ((Buf[5] << 8) + Buf[6], MAX_POS), MIN_POS);
+        M4_Pos_Target = MAX (MIN ((Buf[7] << 8) + Buf[8], MAX_POS), MIN_POS);
+
+        New_Pos = 1;
+      }
+      break;
+
+    default:
+      break;
+  }
+
   return (USBD_OK);
   /* USER CODE END 6 */
 }
@@ -316,6 +340,33 @@ static int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 }
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+
+uint8_t Is_New_Pos(void)
+{
+  const uint8_t Previous_New_pos = New_Pos;
+  New_Pos = 0;
+  return Previous_New_pos;
+}
+
+uint16_t Get_M1_Pos_Target(void)
+{
+  return M1_Pos_Target;
+}
+
+uint16_t Get_M2_Pos_Target(void)
+{
+  return M2_Pos_Target;
+}
+
+uint16_t Get_M3_Pos_Target(void)
+{
+  return M3_Pos_Target;
+}
+
+uint16_t Get_M4_Pos_Target(void)
+{
+  return M4_Pos_Target;
+}
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
