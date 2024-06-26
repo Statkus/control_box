@@ -87,6 +87,8 @@ void Error_Handler(void);
 #define SWCLK_GPIO_Port GPIOA
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
+#define SHAKER_PWM_Pin GPIO_PIN_8
+#define SHAKER_PWM_GPIO_Port GPIOB
 #define FAN_PWM_Pin GPIO_PIN_9
 #define FAN_PWM_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
