@@ -52,13 +52,13 @@
 #define APP_TX_DATA_SIZE  2048
 /* USER CODE BEGIN EXPORTED_DEFINES */
 
-#define MESSAGE_SIZE     10
+#define MESSAGE_SIZE     12
 #define MESSAGE_PERIOD 2000
 
 #define MIN_POS     0
 #define MAX_POS 64000
 
-#define MAX_FAN_PWM 250
+#define MAX_PWM 250
 
 #define MIN_DELAY     40
 #define DEFAULT_DELAY 60
@@ -128,6 +128,7 @@ uint16_t Get_M3_Pos_Target(void);
 uint16_t Get_M4_Pos_Target(void);
 
 uint8_t Get_Fan_PWM(void);
+uint8_t Get_Shaker_PWM(void);
 
 /* USER CODE END EXPORTED_FUNCTIONS */
 

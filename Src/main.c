@@ -141,7 +141,10 @@ int main(void)
   uint16_t M_Delay          = DEFAULT_DELAY;
   uint16_t Previous_M_Delay = DEFAULT_DELAY;
 
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+
+  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 500);
 
   /* USER CODE END 2 */
 
@@ -179,6 +182,7 @@ int main(void)
          MAX (MESSAGE_PERIOD / MAX (MAX (MAX (Dist[0], Dist[1]), Dist[2]), Dist[3]), MIN_DELAY);
       }
 
+      __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 500 + (Get_Shaker_PWM() * 2));
       __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, Get_Fan_PWM() * 4);
     }
 

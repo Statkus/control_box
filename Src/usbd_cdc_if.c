@@ -102,7 +102,8 @@ uint16_t M2_Pos_Target = MIN_POS;
 uint16_t M3_Pos_Target = MIN_POS;
 uint16_t M4_Pos_Target = MIN_POS;
 
-uint8_t Fan_PWM = 0;
+uint8_t Fan_PWM    = 0;
+uint8_t Shaker_PWM = 0;
 
 /* USER CODE END PRIVATE_VARIABLES */
 
@@ -273,22 +274,17 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
 
-  switch (Buf[0]) {
-    case 'P':
-      if (*Len >= MESSAGE_SIZE) {
-        M1_Pos_Target = MAX (MIN ((Buf[1] << 8) + Buf[2], MAX_POS), MIN_POS);
-        M2_Pos_Target = MAX (MIN ((Buf[3] << 8) + Buf[4], MAX_POS), MIN_POS);
-        M3_Pos_Target = MAX (MIN ((Buf[5] << 8) + Buf[6], MAX_POS), MIN_POS);
-        M4_Pos_Target = MAX (MIN ((Buf[7] << 8) + Buf[8], MAX_POS), MIN_POS);
+  if (*Len >= MESSAGE_SIZE && Buf[0] == 'S' && Buf[MESSAGE_SIZE - 1] == 'E')
+  {
+    M1_Pos_Target = MAX (MIN ((Buf[1] << 8) + Buf[2], MAX_POS), MIN_POS);
+    M2_Pos_Target = MAX (MIN ((Buf[3] << 8) + Buf[4], MAX_POS), MIN_POS);
+    M3_Pos_Target = MAX (MIN ((Buf[5] << 8) + Buf[6], MAX_POS), MIN_POS);
+    M4_Pos_Target = MAX (MIN ((Buf[7] << 8) + Buf[8], MAX_POS), MIN_POS);
 
-        Fan_PWM = MIN (Buf[9], MAX_FAN_PWM);
+    Fan_PWM    = MIN (Buf[9], MAX_PWM);
+    Shaker_PWM = MIN (Buf[10], MAX_PWM);
 
-        New_Data = 1;
-      }
-      break;
-
-    default:
-      break;
+    New_Data = 1;
   }
 
   return (USBD_OK);
@@ -376,6 +372,11 @@ uint16_t Get_M4_Pos_Target(void)
 uint8_t Get_Fan_PWM(void)
 {
   return Fan_PWM;
+}
+
+uint8_t Get_Shaker_PWM(void)
+{
+  return Shaker_PWM;
 }
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
