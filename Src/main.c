@@ -141,6 +141,8 @@ int main(void)
   uint16_t M_Delay          = DEFAULT_DELAY;
   uint16_t Previous_M_Delay = DEFAULT_DELAY;
 
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -151,7 +153,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    if (Is_New_Pos() > 0) {
+    if (Is_New_Data() > 0) {
       HAL_GPIO_WritePin (LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
       M_Pos_Target[0] = Get_M1_Pos_Target();
@@ -176,6 +178,8 @@ int main(void)
         M_Delay =
          MAX (MESSAGE_PERIOD / MAX (MAX (MAX (Dist[0], Dist[1]), Dist[2]), Dist[3]), MIN_DELAY);
       }
+
+      __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, Get_Fan_PWM() * 4);
     }
 
     if (M_Pos[0] != M_Pos_Target[0] ||

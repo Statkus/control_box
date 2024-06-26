@@ -95,12 +95,14 @@ uint8_t UserTxBufferFS[APP_TX_DATA_SIZE];
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
 
-uint8_t New_Pos = 0;
+uint8_t New_Data = 0;
 
 uint16_t M1_Pos_Target = MIN_POS;
 uint16_t M2_Pos_Target = MIN_POS;
 uint16_t M3_Pos_Target = MIN_POS;
 uint16_t M4_Pos_Target = MIN_POS;
+
+uint8_t Fan_PWM = 0;
 
 /* USER CODE END PRIVATE_VARIABLES */
 
@@ -279,7 +281,9 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
         M3_Pos_Target = MAX (MIN ((Buf[5] << 8) + Buf[6], MAX_POS), MIN_POS);
         M4_Pos_Target = MAX (MIN ((Buf[7] << 8) + Buf[8], MAX_POS), MIN_POS);
 
-        New_Pos = 1;
+        Fan_PWM = MIN (Buf[9], MAX_FAN_PWM);
+
+        New_Data = 1;
       }
       break;
 
@@ -341,11 +345,12 @@ static int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
-uint8_t Is_New_Pos(void)
+uint8_t Is_New_Data(void)
 {
-  const uint8_t Previous_New_pos = New_Pos;
-  New_Pos = 0;
-  return Previous_New_pos;
+  const uint8_t Previous_New_Data = New_Data;
+  New_Data = 0;
+
+  return Previous_New_Data;
 }
 
 uint16_t Get_M1_Pos_Target(void)
@@ -366,6 +371,11 @@ uint16_t Get_M3_Pos_Target(void)
 uint16_t Get_M4_Pos_Target(void)
 {
   return M4_Pos_Target;
+}
+
+uint8_t Get_Fan_PWM(void)
+{
+  return Fan_PWM;
 }
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
