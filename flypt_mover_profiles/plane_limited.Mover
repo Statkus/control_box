@@ -55,7 +55,7 @@
   <POSE>
     <Type>Mover.Poses.AdvancedPoseFromMotion</Type>
     <Name>POSE :: FROM MOTION</Name>
-    <Location>734,579</Location>
+    <Location>731,580</Location>
     <Size>1093,422</Size>
     <Visible>False</Visible>
     <CONTROLS>
@@ -90,7 +90,7 @@
       <pnlRoll.afcSwayInRollFilter.txtFilterText>EMALP(VALUE;50.000)</pnlRoll.afcSwayInRollFilter.txtFilterText>
       <pnlRoll.afcRollFilter.txtFilterText>EMALP(VALUE;50.000)</pnlRoll.afcRollFilter.txtFilterText>
       <pnlYaw.afcYawFilter.txtFilterText>VALUE</pnlYaw.afcYawFilter.txtFilterText>
-      <pnlHeave.afcHeaveFilter.txtFilterText>EMALP(VALUE;50.000)</pnlHeave.afcHeaveFilter.txtFilterText>
+      <pnlHeave.afcHeaveFilter.txtFilterText>EMALP(VALUE;500.000)</pnlHeave.afcHeaveFilter.txtFilterText>
       <pnlSurge.afcSurgeFilter.txtFilterText>VALUE</pnlSurge.afcSurgeFilter.txtFilterText>
       <pnlSway.afcSwayFilter.txtFilterText>VALUE</pnlSway.afcSwayFilter.txtFilterText>
       <TXTUniqueName>3</TXTUniqueName>
@@ -116,6 +116,8 @@
       <TVInputSelection>
         <item>SOURCE :: XPLANE 11 (UDP) AIR</item>
         <item>SOURCE :: XPLANE 11 (UDP) GROUND</item>
+        <item>SOURCE :: FS2020 (SIMCONNECT) AIR</item>
+        <item>SOURCE :: FS2020 (SIMCONNECT) GROUND</item>
       </TVInputSelection>
       <pnlPitch.hsPitchInOut>0;0</pnlPitch.hsPitchInOut>
       <pnlRoll.hsRollInOut>0;0</pnlRoll.hsRollInOut>
@@ -208,7 +210,7 @@
       <NUDStartTime>1490</NUDStartTime>
       <NUDStopTime>0</NUDStopTime>
       <TXTStopString></TXTStopString>
-      <TXTSendString>S&lt;Axis1a&gt;&lt;Axis2a&gt;&lt;Axis3a&gt;&lt;Axis4a&gt;&lt;100&gt;&lt;0&gt;E</TXTSendString>
+      <TXTSendString>S&lt;Axis1a&gt;&lt;Axis2a&gt;&lt;Axis3a&gt;&lt;Axis4a&gt;&lt;0&gt;&lt;0&gt;&lt;250&gt;&lt;50&gt;E</TXTSendString>
       <TXTStartString></TXTStartString>
       <TXTUniqueName>6</TXTUniqueName>
       <TXTInputString></TXTInputString>
@@ -287,13 +289,36 @@
       </tvInputSelection>
     </CONTROLS>
   </VIEWER_GRAPHIC>
+  <SOURCE>
+    <Type>Mover.Sources.MMF.FS2020</Type>
+    <Name>SOURCE :: FS2020 (SIMCONNECT)</Name>
+    <Location>1288,11</Location>
+    <Size>550,550</Size>
+    <Visible>True</Visible>
+    <CONTROLS>
+      <PNLOptions.NUDToGroundSpeed>0.2</PNLOptions.NUDToGroundSpeed>
+      <PNLOptions.NUDToAirSpeed>0.01</PNLOptions.NUDToAirSpeed>
+      <PNLOptions.NUDSpeedEffect>0.015</PNLOptions.NUDSpeedEffect>
+      <PNLOptions.NUDSway>0</PNLOptions.NUDSway>
+      <PNLOptions.NUDSurge>0</PNLOptions.NUDSurge>
+      <PNLOptions.NUDHeave>0</PNLOptions.NUDHeave>
+      <PNLOptions.AFCCalculationsFilter.txtFilterText>VALUE</PNLOptions.AFCCalculationsFilter.txtFilterText>
+      <TXTUniqueName>22</TXTUniqueName>
+      <TXTName>SOURCE :: FS2020 (SIMCONNECT)</TXTName>
+      <SHInputValues.chkShowHide>True</SHInputValues.chkShowHide>
+      <SHOptions.chkShowHide>True</SHOptions.chkShowHide>
+      <CHKAutoConnect>True</CHKAutoConnect>
+      <CHKTopMost>False</CHKTopMost>
+    </CONTROLS>
+  </SOURCE>
   <Z_ORDER>
+    <item>13</item>
     <item>16</item>
     <item>14</item>
     <item>18</item>
-    <item>3</item>
     <item>20</item>
     <item>6</item>
-    <item>13</item>
+    <item>22</item>
+    <item>3</item>
   </Z_ORDER>
 </FLYPT_MOVER>
