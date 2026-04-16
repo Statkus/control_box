@@ -95,7 +95,9 @@ void Error_Handler(void);
 
 #define DIR_DELAY      2
 #define PUL_DOWN_DELAY 2
-#define WAISTED_DELAY  7
+
+//#define M_MAX_SPEED        25000 // step/s
+//#define M_MAX_ACCELERATION 100
 
 /* USER CODE END Private defines */
 

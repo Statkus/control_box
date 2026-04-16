@@ -105,6 +105,9 @@ uint16_t M4_Pos_Target = MIN_POS;
 uint8_t Fan_PWM    = 0;
 uint8_t Shaker_PWM = 0;
 
+uint8_t Max_Speed        = 250;
+uint8_t Max_Acceleration = 0;
+
 /* USER CODE END PRIVATE_VARIABLES */
 
 /**
@@ -284,6 +287,9 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
     Fan_PWM    = MIN (Buf[9], MAX_PWM);
     Shaker_PWM = MIN (Buf[10], MAX_PWM);
 
+    Max_Speed        = Buf[11];
+    Max_Acceleration = Buf[12];
+
     New_Data = 1;
   }
 
@@ -377,6 +383,16 @@ uint8_t Get_Fan_PWM(void)
 uint8_t Get_Shaker_PWM(void)
 {
   return Shaker_PWM;
+}
+
+uint8_t Get_Max_Speed(void)
+{
+  return Max_Speed;
+}
+
+uint8_t Get_Max_Acceleration(void)
+{
+  return Max_Acceleration;
 }
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
